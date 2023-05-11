@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/05/11 18:33:47 by dayou             #+#    #+#             */
+/*   Updated: 2023/05/11 18:36:06 by dayou            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "get_next_line.h"
 #include <stdio.h>
 #include <unistd.h>
@@ -9,12 +21,12 @@ int main(void)
     char *path = "/Users/u_u/Desktop/42seoul/get_next_line/moby_dick.txt";
 
     int fd = open(path, O_RDONLY);
-    char *tmp = get_next_line(fd);
-    while (tmp)
+    char *line = get_next_line(fd);
+    while (line)
     {
-        printf("%s", tmp);
-        free(tmp);
-        tmp = get_next_line(fd);
+        printf("%s", line);
+        free(line);
+        line = get_next_line(fd);
     }
     return 0;
 }
