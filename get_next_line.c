@@ -6,132 +6,135 @@
 /*   By: dayou <dayou@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 14:03:23 by dayou             #+#    #+#             */
-/*   Updated: 2023/05/12 17:18:13 by dayou            ###   ########.fr       */
+/*   Updated: 2023/05/15 02:30:02 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+#include <stdio.h>
 
-size_t find_n(char * s)
+size_t find_newline(char *s)
 {
     size_t size;
 
     size = 0;
-    while (s[size++])
+    while (size < BUFFER_SIZE)
     {
         if(s[size] == '\n')
-            return size; // '\n'이 3번째 인덱스에 있을 때, 3 반환 = 배열 만들 때 size(인덱스) + 1 + '\0' 까지 총 + 2 필요.
+            return size;
+        size++;
     }
     return 0;
 }
 
 char * make_line(char * s, size_t size)
 {
-    char * line;
     size_t idx;
-
+    char * line;
+    
     idx = -1;
-    line = (char *)malloc(sizeof(char) * (size + 1));
+    if(size == BUFFER_SIZE)
+        line = (char *)malloc(sizeof(char) * (size + 1));
+    else
+        line = (char *)malloc(sizeof(char) * (size + 2));
     if(line == 0)
         return 0;
-    while (++idx <= size)
+    while (++idx <= size && s[idx])
         line[idx] = s[idx];
-    line[idx + 1] = '\0';
-    return line;    
+    line[idx] = '\0';
+    return line;
 }
 
 void push_str(char * s, size_t size)
 {
-    size_t idx;
+    size_t cnt;
 
-    idx = 0;
-    while (size < BUFFER_SIZE && s[size])
+    cnt = 0;
+    while (s[cnt])
     {
-        s[idx] = s[size];
-        idx++;
-        size++;
+        s[cnt] = s[size + cnt + 1];
+        cnt++;
     }
-    s[idx] = '\0';
+    s[cnt] = '\0';
 }
 
-char * join_str(char * s1, char * s2, size_t s2_size) // s1 뒤에 s2 붙이기
+char * line_join(char * no_newline, char * s, size_t size)
 {
-    size_t size;
     size_t len;
-    char * join_s;
+    size_t idx;
+    char * line_join;
 
-    size = 0;
-    while(s1[size])
-        size++;
-    len = size + s2_size;
-    join_s = (char *)malloc(sizeof(char) * (len));
-    if(join_s == 0)
+    len = 0;
+    idx = 0;
+    while (no_newline[len])
+        len++;
+    line_join = (char *)malloc(sizeof(char) * (len + size + 2));
+    if(line_join == 0)
         return 0;
-    join_s[len] = '\0';
-    size = -1;
-    while (s1[++size])
-        join_s[size] = s1[size];
-    size = -1;
-    while (s2[++size])
-        join_s[size] = s2[size];
-    free(s1);
-    return join_s;
+    while (no_newline[idx])
+    {
+       line_join[idx] = no_newline[idx];
+       idx++; 
+    }
+    len = 0;
+    while (len <= size)
+    {
+        line_join[idx++] = s[len++];
+    }
+    line_join[idx] = '\0';
+    free(no_newline);
+    return line_join;
 }
 
-ssize_t read_flag(int fd, char * buff)
+void copy_str(char * buff, char * remainder, size_t size)
 {
-    ssize_t flag;
+    size_t i;
 
-    flag = read(fd, buff, BUFFER_SIZE);
-    while (flag < 0)
-        flag = read(fd, buff, BUFFER_SIZE);
-    if (flag == 0)
-        return 0;
-    else
-        return flag;
+    i = 0;
+    while (size < BUFFER_SIZE && buff[size])
+    {
+        remainder[i++] = buff[size++];
+    }
+    remainder[i] = '\0';
 }
 
 char * get_next_line(int fd)
 {
     if (fd < 0 || BUFFER_SIZE < 0)
-        return;
+        return 0;
     
     char buff[BUFFER_SIZE];
-    static char temp[BUFFER_SIZE +1] = {0, };
-    char * no_newlines;
+    static char remainder[BUFFER_SIZE + 1] = {0, };
+    char * no_newline;
     char * line;
-    size_t size;
+    size_t size = 0;
 
-    size = 0; // size = idx
-    //temp에 문자가 있는가?
-    if(*temp) // -> yes
-    {   size = find_n(temp); //temp에 개행이 있는가?
-        if(size) // -> yes 개행 있음
-        {
-            line = make_line(temp, size + 1); // 0 반환했을 때 처리 생각하기
-            push_str(temp, size); // line을 뺀 만큼 temp 문자열 밀기
-        }
-        else // -> no 개행 없음
-        { // no_newlines에 저장된 문자가 있는가?
-            if(no_newlines) // -> yes 저장된 문자 있음
-            {
-                no_newlines = join_s(no_newlines, temp, size);
-                *temp = '\0'; //temp 초기화
-            }
-            else // -> no 저장된 문자 없음
-            {
-                no_newlines = make_line(temp, size + 1); // no_new에 문자열 할당
-                *temp = '\0'; //temp 초기화
-            } 
-        }
-    }
-    else // -> no
+    size = find_newline(remainder);
+    if(size)
     {
-        if(0 == read_flag(fd, buff))
-        {
-            
-        }  
+        line = make_line(remainder, size);
+        line = line_join(no_newline, line, size);
+        push_str(remainder, size);
     }
-
-	return line;
+    else
+    {
+        if(-1 == read(fd, buff, BUFFER_SIZE))
+        {
+            free(no_newline);
+            free(line);
+            return 0;
+        }
+        else
+        {
+            size = find_newline(buff);
+            if(size)
+            {    
+                line = make_line(buff, size);
+                copy_str(buff, remainder, size + 1);
+            }
+            else
+                no_newline = make_line(buff, size);
+        }
+    }
+    return line;
 }

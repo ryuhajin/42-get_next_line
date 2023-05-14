@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
+/*   By: dayou <dayou@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/11 18:33:47 by dayou             #+#    #+#             */
-/*   Updated: 2023/05/11 18:36:06 by dayou            ###   ########.fr       */
+/*   Updated: 2023/05/15 01:38:12 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,8 @@
 
 int main(void)
 {
-    char *path = "/Users/u_u/Desktop/42seoul/get_next_line/moby_dick.txt";
+  //char *path = "/Users/u_u/Desktop/42seoul/get_next_line/moby_dick.txt";
+    char *path = "/Users/u_u/Desktop/42seoul/get_next_line/test.txt";
 
     int fd = open(path, O_RDONLY);
     char *line = get_next_line(fd);
@@ -28,5 +29,7 @@ int main(void)
         free(line);
         line = get_next_line(fd);
     }
+    close(fd);
+
     return 0;
 }
