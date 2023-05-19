@@ -6,7 +6,7 @@
 /*   By: dayou <dayou@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 14:03:23 by dayou             #+#    #+#             */
-/*   Updated: 2023/05/15 22:05:27 by dayou            ###   ########.fr       */
+/*   Updated: 2023/05/19 15:39:39 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,7 @@ char * get_next_line(int fd)
 {
     if (fd < 0 || BUFFER_SIZE < 0)
         return 0;
-    char buff[BUFFER_SIZE];
+    char buff[BUFFER_SIZE + 1];
     static char remainder[BUFFER_SIZE + 1] = {0, };
     char * line;
     char * no_newline;
@@ -123,14 +123,15 @@ char * get_next_line(int fd)
     {
         line = make_line(remainder, size);
         push_str(remainder, size);
-        return line;        
+        return line;
     }
     else
     {
         no_newline = make_line(remainder, size);
         remainder[0] = '\0';
         while (0 < (size = read(fd, buff, BUFFER_SIZE)))
-        {   
+        {
+            buff[size] = '\0';
             size = find_newline(buff);
             if(size != -1)
             {
@@ -139,9 +140,14 @@ char * get_next_line(int fd)
                 return line;
             }
             else
+            {
                 no_newline = line_join(no_newline, buff, -1);
+            }
         }
-        line = line_join(no_newline, buff, -1);
-        return line;
+        no_newline = line_join(no_newline, buff, -1);
     }
+    if(size == -1 || *no_newline == 0)
+        return 0;
+    else
+        return no_newline;
 }
