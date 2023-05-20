@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   test.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dayou <dayou@student.42seoul.kr>           +#+  +:+       +#+        */
+/*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/19 16:24:13 by dayou             #+#    #+#             */
-/*   Updated: 2023/05/19 22:05:46 by dayou            ###   ########.fr       */
+/*   Updated: 2023/05/20 21:59:21 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,33 +37,37 @@ char	*ft_strdup(char *s1)
 
 char	*ft_strjoin(char *s1, char *s2, ssize_t size)
 {
-	size_t	len;
-    size_t  result;
+	ssize_t	len;
+    ssize_t idx;
 	char	*line;
 
 	len = 0;
+	idx = 0;
 	while (s1[len])
         len++;
-    result = len;
-    while (len <= size)
-        len++;
-    result += len;
-	line = (char *)malloc(sizeof(char) * (result + 1));
+    while (s2[idx] && idx < size + 1)
+    {   
+		idx++; 
+		len++;
+	}
+	// printf("s2 len: %zd\n", len);
+	line = (char *)malloc(sizeof(char) * (len + 1));
+	// printf("result: %zd\n", result);
 	if (line == NULL)
 		return (NULL);
-    line[result] = '\0';
-    len = ft_strlcpy(line, s1);
-    ft_strlcpy(line + len, s2);
+    line[len] = '\0';
+    len = ft_strlcpy(line, s1, ft_strchr(s1, '\0'));
+    ft_strlcpy(line + len, s2, size);
     free(s1);
 	return (line);
 }
 
-size_t	ft_strlcpy(char *dest, char *src)
+size_t	ft_strlcpy(char *dest, char *src, ssize_t size)
 {
-	size_t	i;
+	ssize_t	i;
 
 	i = 0;
-	while (src[i])
+	while (src[i] && i < size)
 	{
 		dest[i] = src[i];
 		i++;
@@ -86,6 +90,8 @@ ssize_t ft_strchr(char *str, int c)
 			return (i);
 		i++;
 	}
+	if(character == '\0')
+		return i;
 	return (-1);
 }
 
@@ -103,29 +109,32 @@ char * get_next_line(int fd)
     if (-1 < (size = ft_strchr(remainder, '\n')))
     {
         line = ft_strjoin(line, remainder, size);
-        ft_strlcpy(remainder, remainder + size + 1);
+        ft_strlcpy(remainder, remainder + size + 1, ft_strchr(remainder, '\0'));
         return line;
     }
     else
-    {   
+    {
         while (-1 < (flag = read(fd, buff, BUFFER_SIZE)))
         {
             if(flag == 0)
                 break;
             buff[flag] = '\0';
-            if ((size = ft_strchr(buff, '\n')))
+            if (-1 < (size = ft_strchr(buff, '\n')))
             {
-                line = ft_strjoin(line, buff, size);
-                ft_strlcpy(remainder, buff + size + 1);
+                line = ft_strjoin(line, buff, size); // '\n' 까지 돔
+                ft_strlcpy(remainder, buff + size + 1, ft_strchr(buff, '\0'));
                 return line;
             }
             else
-                line = ft_strjoin(line, buff, flag);
+                line = ft_strjoin(line, buff, flag); // flag 까지 돔 (읽은 바이트 수)
         }
+		if (flag == 0 && *line)
+		{
+			line = ft_strjoin(line, remainder, ft_strchr(remainder, '\0'));
+        	return line;
+		}
     }
     if (flag == -1)
-        free(line);
-    else if(*line)
-        return line;
+		free(line);
     return NULL;
 }

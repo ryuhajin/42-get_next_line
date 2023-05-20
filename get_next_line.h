@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.h                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dayou <dayou@student.42seoul.kr>           +#+  +:+       +#+        */
+/*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 14:04:25 by dayou             #+#    #+#             */
-/*   Updated: 2023/05/19 21:47:46 by dayou            ###   ########.fr       */
+/*   Updated: 2023/05/20 21:57:03 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 # include <unistd.h>
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 1024
+#  define BUFFER_SIZE 100
 # endif
 
 ssize_t find_newline(char *s);
@@ -28,7 +28,8 @@ void copy_str(char * buff, char * remainder, ssize_t size);
 
 char	*ft_strdup(char *s1);
 char	*ft_strjoin(char *s1, char *s2, ssize_t size);
-size_t	ft_strlcpy(char *dest, char *src);
+size_t	ft_strlcpy(char *dest, char *src, ssize_t size);
+ssize_t ft_strchr(char *str, int c);
 
 char *get_next_line(int fd);
 
