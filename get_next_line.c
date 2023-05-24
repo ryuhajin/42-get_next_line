@@ -6,7 +6,7 @@
 /*   By: dayou <dayou@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 15:18:13 by dayou             #+#    #+#             */
-/*   Updated: 2023/05/25 00:39:27 by dayou            ###   ########.fr       */
+/*   Updated: 2023/05/25 00:43:14 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,9 +63,7 @@ ssize_t	read_file(int fd, char **line, char *remainder)
 
 char	*get_next_line(int fd)
 {
-	static char remainder[BUFFER_SIZE + 1] = {
-		0,
-	};
+	static char remainder[BUFFER_SIZE + 1] = {0, };
 	char *line;
 	ssize_t flag;
 
