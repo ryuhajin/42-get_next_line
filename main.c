@@ -6,7 +6,7 @@
 /*   By: dayou <dayou@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/11 18:33:47 by dayou             #+#    #+#             */
-/*   Updated: 2023/05/19 20:25:25 by dayou            ###   ########.fr       */
+/*   Updated: 2023/05/25 00:32:13 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,9 @@ int main(void)
     char *line = get_next_line(fd);
     while (line)
     {
-         printf("%s", line);
-         free(line);
-         line = get_next_line(fd);
+        printf("%s", line);
+        free(line);
+        line = get_next_line(fd);
     }
     close(fd);
     return 0;
