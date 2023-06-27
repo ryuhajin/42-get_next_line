@@ -3,11 +3,74 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line_utils.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dayou <dayou@student.42seoul.kr>           +#+  +:+       +#+        */
+/*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 14:03:41 by dayou             #+#    #+#             */
-/*   Updated: 2023/05/12 15:37:04 by dayou            ###   ########.fr       */
+/*   Updated: 2023/06/27 22:31:04 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+
+char	*ft_strdup(char *s1)
+{
+	char	*line;
+	size_t	size;
+	size_t	idx;
+
+	size = 0;
+	while (s1[size])
+		size++;
+	line = (char *)malloc(sizeof(char) * (size + 1));
+	if (line == NULL)
+		return (NULL);
+	idx = 0;
+	while (s1[idx])
+	{
+		line[idx] = s1[idx];
+		idx++;
+	}
+	line[size] = '\0';
+	return (line);
+}
+
+char	*ft_strjoin(char *s1, char *s2, ssize_t size)
+{
+	ssize_t	len;
+	ssize_t	idx;
+	char	*line;
+
+	len = 0;
+	while (s1[len])
+		len++;
+	line = (char *)malloc(sizeof(char) * (len + size) + 1);
+	if (line == NULL)
+	{
+		free(s1);
+		return (NULL);
+	}
+	line[len + size] = '\0';
+	ft_strlcpy(line, s1);
+	idx = 0;
+	while (idx < size)
+	{
+		line[len + idx] = s2[idx];
+		idx++;
+	}
+	free(s1);
+	return (line);
+}
+
+size_t	ft_strlcpy(char *dest, char *src)
+{
+	size_t	i;
+
+	i = 0;
+	while (src[i])
+	{
+		dest[i] = src[i];
+		i++;
+	}
+	dest[i] = '\0';
+	return (i);
+}
