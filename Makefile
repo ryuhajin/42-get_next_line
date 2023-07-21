@@ -1,8 +1,8 @@
 CC = cc
 
-CFLAG = -Wall -Werror -Wextra
+CFLAG = -Wall -Werror -Wextra -g
 
-NAME = get_next_line.a
+NAME = libgnl.a
 
 SRCS = get_next_line.c get_next_line_utils.c
 

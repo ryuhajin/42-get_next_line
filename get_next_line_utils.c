@@ -6,7 +6,7 @@
 /*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 14:03:41 by dayou             #+#    #+#             */
-/*   Updated: 2023/06/27 22:31:04 by dayou            ###   ########.fr       */
+/*   Updated: 2023/06/28 19:34:11 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,4 +73,22 @@ size_t	ft_strlcpy(char *dest, char *src)
 	}
 	dest[i] = '\0';
 	return (i);
+}
+
+ssize_t	find_newline(char *buff, ssize_t *size)
+{
+	ssize_t	idx;
+
+	idx = 0;
+	while (buff[idx])
+	{
+		if (buff[idx] == '\n')
+		{
+			*size = idx;
+			return (make_new_line);
+		}
+		idx++;
+	}
+	*size = idx;
+	return (no_new_line);
 }

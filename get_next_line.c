@@ -6,7 +6,7 @@
 /*   By: dayou <da1712@student.42seoul.kr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 15:18:13 by dayou             #+#    #+#             */
-/*   Updated: 2023/06/27 23:02:22 by dayou            ###   ########.fr       */
+/*   Updated: 2023/06/28 19:36:19 by dayou            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,30 +15,25 @@
 ssize_t	remainder_find_n(int fd, char **line, char remainder[][BUFFER_SIZE + 1])
 {
 	ssize_t	size;
-	
-	size = 0;
-	if(*line == NULL)
-		return 0;
-	while (remainder[fd][size])
+	ssize_t	flag;
+
+	*line = ft_strdup("");
+	if (*line == NULL)
+		return (line_malloc_failed);
+	flag = find_newline(remainder[fd], &size);
+	if (flag == make_new_line)
 	{
-		if (remainder[fd][size] == '\n')
-		{
-			*line = ft_strjoin(*line, remainder[fd], size + 1);
-			if (*line == NULL)
-				return (2);
-			ft_strlcpy(remainder[fd], &(remainder[fd][size + 1]));
-			return (1);
-		}
-		size++;
+		*line = ft_strjoin(*line, remainder[fd], size + 1);
+		if (*line == NULL)
+			return (line_malloc_failed);
+		ft_strlcpy(remainder[fd], &(remainder[fd][size + 1]));
+		return (make_new_line);
 	}
-	if (size)
-	{
-		*line = ft_strjoin(*line, remainder[fd], size);
-		if(*line == NULL)
-			return (2);
-		remainder[fd][0] = '\0';
-	}
-	return (0);
+	*line = ft_strjoin(*line, remainder[fd], size);
+	if (*line == NULL)
+		return (line_malloc_failed);
+	remainder[fd][0] = '\0';
+	return (no_new_line);
 }
 
 ssize_t	read_file(int fd, char **line, char remainder[][BUFFER_SIZE + 1])
@@ -47,49 +42,32 @@ ssize_t	read_file(int fd, char **line, char remainder[][BUFFER_SIZE + 1])
 	ssize_t	flag;
 	ssize_t	size;
 
-	while (0 < (flag = read(fd, buff, BUFFER_SIZE)))
+	flag = read(fd, buff, BUFFER_SIZE);
+	while (read_EOF < flag)
 	{
 		buff[flag] = '\0';
-		size = 0;
-		while (buff[size])
+		flag = find_newline(buff, &size);
+		if (flag == make_new_line)
 		{
-			if (buff[size] == '\n')
-			{
-				*line = ft_strjoin(*line, buff, size + 1);
-				if (*line == NULL)
-					return (-1);
-				ft_strlcpy(remainder[fd], buff + (size + 1));
-				return (flag);
-			}
-			size++;
+			*line = ft_strjoin(*line, buff, size + 1);
+			if (*line == NULL)
+				return (line_malloc_failed);
+			ft_strlcpy(remainder[fd], buff + (size + 1));
+			return (flag);
 		}
 		*line = ft_strjoin(*line, buff, size);
 		if (*line == NULL)
-			return (-1);
+			return (line_malloc_failed);
+		flag = read(fd, buff, BUFFER_SIZE);
 	}
 	return (flag);
 }
 
-char	*get_next_line(int fd)
+char	*read_flag_check(ssize_t flag, char *line)
 {
-	static char remainder[OPEN_MAX][BUFFER_SIZE + 1] = {0, };
-	char *line;
-	ssize_t flag;
-
-	if (fd < 0 || BUFFER_SIZE < 0)
-		return (0);
-	line = ft_strdup("");
-	if (line == NULL)
-		return NULL;
-	flag = remainder_find_n(fd, &line, remainder);
-	if (flag == 2)
-		return NULL;
-	if (flag == 1)
+	if (flag == make_new_line)
 		return (line);
-	flag = read_file(fd, &line, remainder);
-	if (0 < flag)
-		return (line);
-	else if (flag == 0)
+	else if (flag == read_EOF)
 	{
 		if (*line != '\0')
 			return (line);
@@ -99,7 +77,24 @@ char	*get_next_line(int fd)
 			return (NULL);
 		}
 	}
-	else if (flag == -1)
+	else if (flag == read_failed)
 		free(line);
 	return (NULL);
+}
+
+char	*get_next_line(int fd)
+{
+	static char	remainder[OPEN_MAX][BUFFER_SIZE + 1];
+	char		*line;
+	ssize_t		flag;
+
+	if (fd < 0 || BUFFER_SIZE < 0)
+		return (0);
+	flag = remainder_find_n(fd, &line, remainder);
+	if (flag == line_malloc_failed)
+		return (NULL);
+	if (flag == make_new_line)
+		return (line);
+	flag = read_file(fd, &line, remainder);
+	return (read_flag_check(flag, line));
 }
